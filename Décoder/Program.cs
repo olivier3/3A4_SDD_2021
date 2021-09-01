@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using cstjean.info.fg.consoleplus;
 
 namespace Décoder
@@ -9,18 +11,42 @@ namespace Décoder
         public static string Décoder(string message)
         {
             var pile = new Stack<char>();
-            var messageFinal = "";
-            foreach (char elem in message)
+            string messageFinal = "";
+            int longueurMessage = message.Count();
+
+            for (int i = 0; i < longueurMessage; i++)
             {
-                if (elem.Equals('*'))
+                if (message[i].Equals('*'))
                 {
-                    messageFinal += pile.Pop();
+                    try
+                    {
+                        messageFinal += pile.Pop();
+                    }
+                    catch
+                    {
+                        var sb = new StringBuilder();
+
+                        for (int j = 0; j < longueurMessage; j++)
+                        {
+                            if (i.Equals(j))
+                            {
+                                sb.Append($"[{message[j]}]");
+                            }
+                            else
+                            {
+                                sb.Append($"{message[j]}");
+                            }
+                        }
+                        throw new FormatException($" ERREUR: Message secret invalide - stack underflow {sb}");
+                    }
                 }
                 else
                 {
-                    pile.Push(elem);
+                    pile.Push(message[i]);
                 }
             }
+
+
 
             return messageFinal;
         }
@@ -40,8 +66,15 @@ namespace Décoder
                 ConsolePlus.Write(ConsoleColor.Blue, "Décoder> ");
                 message = Console.ReadLine();
 
-                ConsolePlus.WriteLine(ConsoleColor.Green, $"          {Décoder(message)}");
-                Console.WriteLine();
+                try
+                {
+                    ConsolePlus.WriteLine(ConsoleColor.Green, $"          {Décoder(message)}");
+                }
+                catch (FormatException ex)
+                {
+                    ConsolePlus.WriteLine(ConsoleColor.Red, ex.Message);
+                    Console.WriteLine();
+                }
             }
 
             ConsolePlus.WriteLine(ConsoleColor.DarkYellow, "Au revoir");
