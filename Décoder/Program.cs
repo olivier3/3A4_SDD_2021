@@ -13,6 +13,27 @@ namespace Décoder
             var pile = new Stack<char>();
             string messageFinal = "";
             int longueurMessage = message.Count();
+            int cptEtoile = 0;
+            int cptLettre = 0;
+
+            foreach (char elem in message)
+            {
+                if (elem.Equals('*'))
+                {
+                    cptEtoile++;
+                }
+                else
+                {
+                    cptLettre++;
+                }
+            }
+
+            if (cptEtoile < cptLettre)
+            {
+                int nbManquant = cptLettre - cptEtoile;
+
+                throw new FormatException($" ERREUR: Message secret invalide - étoiles manquantes '{String.Concat(Enumerable.Repeat('*', nbManquant))}' à la fin");
+            }
 
             for (int i = 0; i < longueurMessage; i++)
             {
@@ -61,14 +82,17 @@ namespace Décoder
 
             string message = "";
 
-            while (message != "exit")
+            for (; ; )
             {
                 ConsolePlus.Write(ConsoleColor.Blue, "Décoder> ");
                 message = Console.ReadLine();
 
+                if (message.Equals("exit")) break;
+
                 try
                 {
                     ConsolePlus.WriteLine(ConsoleColor.Green, $"          {Décoder(message)}");
+                    Console.WriteLine();
                 }
                 catch (FormatException ex)
                 {
@@ -77,7 +101,7 @@ namespace Décoder
                 }
             }
 
-            ConsolePlus.WriteLine(ConsoleColor.DarkYellow, "Au revoir");
+            ConsolePlus.Write(ConsoleColor.DarkYellow, "Au revoir");
         }
     }
 }
